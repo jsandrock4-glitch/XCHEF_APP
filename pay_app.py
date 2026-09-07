@@ -7,13 +7,15 @@ from pypdf import PdfReader
 import streamlit as str_launch
 
 # =========================================================
-# 1. KONFIGURASIE & AI OPSTEL
+# 1. CONFIGURATION & AI SETUP
 # =========================================================
 
 API_KEY = os.environ.get("GCP_API_KEY", "")
 client = genai.Client(api_key=API_KEY)
+
+
 def read_document_texts(file) -> str:
-    """read text automatically from TXT, MD, PDF or DOCX files."""
+    """Read text automatically from TXT, MD, PDF or DOCX files."""
     try:
         if file.name.endswith(".pdf"):
             reader = PdfReader(file)
@@ -32,14 +34,14 @@ def read_document_texts(file) -> str:
         return f"error reading file: {str(e)}"
 
 
-def analiseer_groot_visie(
+def analyze_grand_vision(
     model_type: str,
-    utility_discription: str,
-    supply_discription: str,
-    treasury_discription: str,
+    utility_description: str,
+    supply_description: str,
+    treasury_description: str,
     extra_document_texts: str = "",
 ) -> str:
-    konteks_en_instruksies = (
+    context_and_instructions = (
         "You are an elite Venture Capital partner, enterprise software"
         " architect, and head economist.\nAnalyze the following project and"
         " generate a master breakdown completely in professional English.\n\nYou"
@@ -55,83 +57,83 @@ def analiseer_groot_visie(
         " steps the founder must take."
     )
 
-    volledige_prompt = (
-        f"{konteks_en_instruksies}\n\n--- FOUNDER'S PROJECT DATA ---\n• Chosen"
-        f" Architecture: {model_tipe}\n• Utility & Incentives:"
-        f" {nut_beskrywing if nut_beskrywing.strip() else 'Extract directly from document'}\n•"
+    full_prompt = (
+        f"{context_and_instructions}\n\n--- FOUNDER'S PROJECT DATA ---\n• Chosen"
+        f" Architecture: {model_type}\n• Utility & Incentives:"
+        f" {utility_description if utility_description.strip() else 'Extract directly from document'}\n•"
         f" Supply & Allocation:"
-        f" {supply_beskrywing if supply_beskrywing.strip() else 'Extract directly from document'}\n•"
+        f" {supply_description if supply_description.strip() else 'Extract directly from document'}\n•"
         f" Treasury Flows:"
-        f" {treasury_beskrywing if treasury_beskrywing.strip() else 'Extract directly from document'}\n"
+        f" {treasury_description if treasury_description.strip() else 'Extract directly from document'}\n"
     )
-    if ekstra_dokument_teks:
-        volledige_prompt += (
+    if extra_document_texts:
+        full_prompt += (
             "\n--- FULL ATTACHED DOCUMENT / WHITE-PAPER CONTENT"
-            f" ---\n{ekstra_dokument_teks}\n"
+            f" ---\n{extra_document_texts}\n"
         )
 
     response = client.models.generate_content(
-        model="gemini-2.5-flash", contents=volledige_prompt
+        model="gemini-2.5-flash", contents=full_prompt
     )
     return response.text
 
 
-# 10 VERSKILLENDE MOCK ENTERPRISES
+# 10 DIFFERENT MOCK ENTERPRISES
 MOCK_FARMS_REGISTRY = [
     {
-        "entiteit": "Green Valley Agri (Pty) Ltd",
-        "plaas": "Farm 402 - Klerksdorp District",
+        "entity": "Green Valley Agri (Pty) Ltd",
+        "farm": "Farm 402 - Klerksdorp District",
         "gps": 'S 26° 52\' 10", E 26° 40\' 03"',
     },
     {
-        "entiteit": "Goudveld Graan Boerdery BK",
-        "plaas": "Plaas 112 - Potchefstroom Sektor",
+        "entity": "Goudveld Grain Farming CC",
+        "farm": "Farm 112 - Potchefstroom Sector",
         "gps": 'S 26° 42\' 15", E 27° 05\' 44"',
     },
     {
-        "entiteit": "Highveld Citrus & Dairy Enterprise",
-        "plaas": "Farm 804 - Bethal District",
+        "entity": "Highveld Citrus & Dairy Enterprise",
+        "farm": "Farm 804 - Bethal District",
         "gps": 'S 26° 27\' 01", E 29° 27\' 50"',
     },
     {
-        "entiteit": "Bramley Livestock & Crops (Pty) Ltd",
-        "plaas": "Plaas 305 - Middelburg Oos",
+        "entity": "Bramley Livestock & Crops (Pty) Ltd",
+        "farm": "Farm 305 - Middelburg East",
         "gps": 'S 25° 46\' 19", E 29° 28\' 33"',
     },
     {
-        "entiteit": "Karoo Eco-Agri Co-Op",
-        "plaas": "Farm 12 - Graaff-Reinet District",
+        "entity": "Karoo Eco-Agri Co-Op",
+        "farm": "Farm 12 - Graaff-Reinet District",
         "gps": 'S 32° 15\' 08", E 24° 32\' 11"',
     },
     {
-        "entiteit": "Overberg Wheat & Wool Holdings",
-        "plaas": "Plaas 567 - Caledon Sektor",
+        "entity": "Overberg Wheat & Wool Holdings",
+        "farm": "Farm 567 - Caledon Sector",
         "gps": 'S 34° 13\' 44", E 19° 25\' 22"',
     },
     {
-        "entiteit": "Limpopo Subtropical Produce (Pty) Ltd",
-        "plaas": "Farm 921 - Tzaneen Valley",
+        "entity": "Limpopo Subtropical Produce (Pty) Ltd",
+        "farm": "Farm 921 - Tzaneen Valley",
         "gps": 'S 23° 49\' 55", E 30° 09\' 40"',
     },
     {
-        "entiteit": "Vrystaat Mielies & Soja BK",
-        "plaas": "Plaas 208 - Kroonstad Sektor",
+        "entity": "Free State Maize & Soy CC",
+        "farm": "Farm 208 - Kroonstad Sector",
         "gps": 'S 27° 39\' 12", E 27° 14\' 02"',
     },
     {
-        "entiteit": "Kalahari Beef Exporters",
-        "plaas": "Farm 44 - Vryburg West",
+        "entity": "Kalahari Beef Exporters",
+        "farm": "Farm 44 - Vryburg West",
         "gps": 'S 26° 57\' 30", E 24° 43\' 50"',
     },
     {
-        "entiteit": "Natal Midlands Organics Co.",
-        "plaas": "Farm 610 - Howick District",
+        "entity": "Natal Midlands Organics Co.",
+        "farm": "Farm 610 - Howick District",
         "gps": 'S 29° 28\' 04", E 30° 13\' 18"',
     },
 ]
 
 # ==========================================
-# 2. SESSION STATE (GEBRUIKER, WALLETS & TOKEN PRYS)
+# 2. SESSION STATE (USER, WALLETS & TOKEN PRICE)
 # ==========================================
 
 if "is_registered" not in str_launch.session_state:
@@ -143,7 +145,7 @@ if "user_profile" not in str_launch.session_state:
 if "fetched_agri_data" not in str_launch.session_state:
     str_launch.session_state["fetched_agri_data"] = None
 
-# BEURSIE SALDO'S
+# WALLET BALANCES
 if "wallets" not in str_launch.session_state:
     str_launch.session_state["wallets"] = {
         "Consumer": 1000.00,
@@ -153,7 +155,7 @@ if "wallets" not in str_launch.session_state:
         "Consumer_Rewards": 25.00,
     }
 
-# XCHEF-E TRADING TOKEN PRYS (AANVANGSWAARDE $0.0100)
+# XCHEF-E TRADING TOKEN PRICE (INITIAL VALUE $0.0100)
 if "xchef_e_price" not in str_launch.session_state:
     str_launch.session_state["xchef_e_price"] = 0.0100
 
@@ -161,7 +163,7 @@ if "tx_history" not in str_launch.session_state:
     str_launch.session_state["tx_history"] = []
 
 # ==========================================
-# 3. PREMIUM FINTECH VISUELE STYLING (CSS)
+# 3. PREMIUM FINTECH VISUAL STYLING (CSS)
 # ==========================================
 
 str_launch.set_page_config(
@@ -197,71 +199,71 @@ str_launch.markdown(
     unsafe_allow_html=True,
 )
 
-if "chat_geskiedenis" not in str_launch.session_state:
-    str_launch.session_state["chat_geskiedenis"] = []
+if "chat_history" not in str_launch.session_state:
+    str_launch.session_state["chat_history"] = []
 
 # ==========================================
-# 4. HOOF LOGIKA: REGISTRASIE vs DASHBOARD
+# 4. MAIN LOGIC: REGISTRATION vs DASHBOARD
 # ==========================================
 
 if not str_launch.session_state["is_registered"]:
     str_launch.title("👑 Welcome to XCHEF | Enterprise Onboarding")
     str_launch.write(
-        "Voltooi jou outomatiese verifikasie om toegang tot die XCHEF"
-        " Ekosisteem te kry."
+        "Complete your automated verification to gain access to the XCHEF"
+        " Ecosystem."
     )
     str_launch.markdown("<br>", unsafe_allow_html=True)
 
     col_centered = str_launch.columns([1, 2, 1])[1]
     with col_centered:
         str_launch.subheader("🔒 Create & Verify Profile")
-        rol = str_launch.selectbox(
-            "Kies jou Rol op die Platform:",
-            ["Farmer (Boer)", "Consumer (Verbruiker)", "Business (Handelaar)"],
+        role = str_launch.selectbox(
+            "Select your Role on the Platform:",
+            ["Farmer", "Consumer", "Business (Merchant)"],
         )
 
-        naam_input = str_launch.text_input(
-            "Volle Naam & Van:", value="Johannes van der Merwe"
+        name_input = str_launch.text_input(
+            "Full Name & Surname:", value="Johannes van der Merwe"
         )
-        email = str_launch.text_input("E-pos Adres:")
+        email = str_launch.text_input("Email Address:")
 
-        if rol == "Farmer (Boer)":
+        if role == "Farmer":
             str_launch.markdown("---")
             str_launch.markdown(
                 "### 🚜 Automated National Agri-Registry Lookup"
             )
 
-            landbou_no = str_launch.text_input(
-                "Voer Landbou Registrasie / Belasting ID in:",
+            agri_id = str_launch.text_input(
+                "Enter Agricultural Registration / Tax ID:",
                 value="AGRI-3857-ZA",
             )
 
             if str_launch.button("🔍 Fetch Agri Registry Data (API Sync)"):
-                if not naam_input.strip():
-                    str_launch.error("Tik asseblief eers jou Naam & Van bo in!")
+                if not name_input.strip():
+                    str_launch.error("Please enter your Full Name & Surname above first!")
                 else:
                     with str_launch.spinner(
-                        "Verbind tans met Sentrale Landbou Databasis..."
+                        "Connecting to Central Agricultural Database..."
                     ):
                         time.sleep(1.2)
-                        digits = "".join(filter(str.isdigit, landbou_no))
+                        digits = "".join(filter(str.isdigit, agri_id))
                         index = (
                             int(digits) % len(MOCK_FARMS_REGISTRY)
                             if digits
                             else 0
                         )
-                        gekoose_plaas = MOCK_FARMS_REGISTRY[index]
+                        selected_farm = MOCK_FARMS_REGISTRY[index]
 
                         str_launch.session_state["fetched_agri_data"] = {
-                            "eienaar": naam_input,
-                            "boerdery_naam": gekoose_plaas["entiteit"],
-                            "plaas_id": gekoose_plaas["plaas"],
-                            "gps_coords": gekoose_plaas["gps"],
+                            "owner": name_input,
+                            "farm_name": selected_farm["entity"],
+                            "farm_id": selected_farm["farm"],
+                            "gps_coords": selected_farm["gps"],
                             "status": "VERIFIED ACTIVE PRODUCER ✅",
                         }
                     str_launch.success(
-                        f"✓ Databasis gevind vir {naam_input}! Besonderhede"
-                        " gelaai."
+                        f"✓ Database record found for {name_input}! Details"
+                        " loaded."
                     )
                     str_launch.rerun()
 
@@ -270,9 +272,9 @@ if not str_launch.session_state["is_registered"]:
                 str_launch.markdown(
                     f"""
                 <div class="agri-card">
-                    <b>🏛️ Geregistreerde Entiteit:</b> {data['boerdery_naam']}<br>
-                    <b>👤 Geregistreerde Eienaar:</b> {data['eienaar']}<br>
-                    <b>📍 Regstreekse Land-ID:</b> {data['plaas_id']}<br>
+                    <b>🏛️ Registered Entity:</b> {data['farm_name']}<br>
+                    <b>👤 Registered Owner:</b> {data['owner']}<br>
+                    <b>📍 Direct Land ID:</b> {data['farm_id']}<br>
                     <b>🛡️ Status:</b> <span style="color:#28a745;">{data['status']}</span>
                 </div>
                 """,
@@ -287,57 +289,57 @@ if not str_launch.session_state["is_registered"]:
                         f"{data['gps_coords']} (Verified Farmland)"
                     )
                     str_launch.success(
-                        f"✓ GPS Koördinate gepas met {data['plaas_id']}!"
+                        f"✓ GPS Coordinates matched with {data['farm_id']}!"
                     )
 
                 if "gps_location" in str_launch.session_state:
                     str_launch.info(
-                        "Plaas GPS Status:"
+                        "Farm GPS Status:"
                         f" {str_launch.session_state['gps_location']}"
                     )
 
-        elif rol == "Business (Handelaar)":
+        elif role == "Business (Merchant)":
             str_launch.markdown("---")
-            str_launch.markdown("### 🏪 Besigheids Verifikasie")
-            cipc_no = str_launch.text_input("CIPC / BTW Registrasienommer:")
+            str_launch.markdown("### 🏪 Business Verification")
+            cipc_no = str_launch.text_input("CIPC / VAT Registration Number:")
 
         str_launch.markdown("<br>", unsafe_allow_html=True)
         if str_launch.button("🚀 Confirm & Complete Registration"):
-            if naam_input and email:
+            if name_input and email:
                 str_launch.session_state["is_registered"] = True
 
-                # Veilig verkry agri_data (hanteer None waardes korrek)
+                # Safely retrieve agri_data (handles None values correctly)
                 agri_data = (
                     str_launch.session_state.get("fetched_agri_data") or {}
                 )
 
                 str_launch.session_state["user_profile"] = {
-                    "naam": naam_input,
+                    "name": name_input,
                     "email": email,
-                    "rol": rol,
-                    "boerdery_naam": agri_data.get("boerdery_naam", "N/A"),
+                    "role": role,
+                    "farm_name": agri_data.get("farm_name", "N/A"),
                     "gps": str_launch.session_state.get("gps_location", "N/A"),
                 }
-                str_launch.success("Verifikasie Suksesvol! Welkom by XCHEF.")
+                str_launch.success("Verification Successful! Welcome to XCHEF.")
                 str_launch.rerun()
             else:
-                str_launch.error("Vul asseblief jou Naam en E-pos in.")
+                str_launch.error("Please fill in your Name and Email.")
 else:
     # Sidebar
     str_launch.sidebar.title("👤 Active Verified Account")
     str_launch.sidebar.write(
-        f"**Naam:** {str_launch.session_state['user_profile']['naam']}"
+        f"**Name:** {str_launch.session_state['user_profile']['name']}"
     )
     str_launch.sidebar.write(
-        f"**Rol:** {str_launch.session_state['user_profile']['rol']}"
+        f"**Role:** {str_launch.session_state['user_profile']['role']}"
     )
-    if str_launch.session_state["user_profile"]["boerdery_naam"] != "N/A":
+    if str_launch.session_state["user_profile"]["farm_name"] != "N/A":
         str_launch.sidebar.write(
-            "**Entiteit:**"
-            f" {str_launch.session_state['user_profile']['boerdery_naam']}"
+            "**Entity:**"
+            f" {str_launch.session_state['user_profile']['farm_name']}"
         )
     if str_launch.session_state["user_profile"]["gps"] != "N/A":
-        str_launch.sidebar.write("**Plaas GPS:** Verified 📍")
+        str_launch.sidebar.write("**Farm GPS:** Verified 📍")
 
     if str_launch.sidebar.button("🔒 Log Out / Reset"):
         str_launch.session_state["is_registered"] = False
@@ -349,7 +351,7 @@ else:
     str_launch.title("👑 XCHEF | Enterprise Platform & Payment Engine")
 
     tab1, tab2 = str_launch.tabs([
-        "💳 Interactive XCHEFPAY Simulator (Bewys vir Beleggers)",
+        "💳 Interactive XCHEFPAY Simulator (Proof for Investors)",
         "📄 AI Master Blueprint Generator",
     ])
 
@@ -358,14 +360,14 @@ else:
     # ------------------------------------------
     with tab1:
         str_launch.subheader(
-            "⚡ Lewendige XCHEF-P Payment & Treasury Engine Simulasie"
+            "⚡ Live XCHEF-P Payment & Treasury Engine Simulation"
         )
         str_launch.write(
-            "Hierdie module simuleer hoe geld deur die XCHEF-ekosisteem vloei en"
-            " hoe transaksie-aanname die XCHEF-E token-waarde verhoog."
+            "This module simulates how money flows through the XCHEF ecosystem and"
+            " how transaction adoption increases the XCHEF-E token value."
         )
 
-        # VERTOON AL 5 WALLETS + DIE TRADING TOKEN WAARDE BLOK
+        # DISPLAY ALL 5 WALLETS + TRADING TOKEN VALUE CARD
         c1, c2, c3, c4, c5, c6 = str_launch.columns(6)
         with c1:
             str_launch.markdown(
@@ -423,85 +425,85 @@ else:
         st_col_a, st_col_b = str_launch.columns([1, 1])
 
         with st_col_a:
-            str_launch.subheader("🛒 Voer 'n Simulasie-Betaling Uit")
-            bedrag = str_launch.number_input(
-                "Transaksie Bedrag ($ / XCHEF-P):",
+            str_launch.subheader("🛒 Execute Simulation Payment")
+            amount = str_launch.number_input(
+                "Transaction Amount ($ / XCHEF-P):",
                 min_value=1.0,
                 value=100.0,
                 step=10.0,
             )
-            tipe_transaksie = str_launch.selectbox(
-                "Kies Transaksie Tipe:",
+            transaction_type = str_launch.selectbox(
+                "Select Transaction Type:",
                 [
                     (
-                        "Geverifieerde Boer Koop Voorraad (5% Productive"
+                        "Verified Farmer Purchases Inventory (5% Productive"
                         " Discount)"
                     ),
-                    "Verbruiker Koop Kos by Handelaar (2% Fee + 1% Cashback)",
+                    "Consumer Purchases Food from Merchant (2% Fee + 1% Cashback)",
                     "Fiat On-Ramp (10% Treasury Deposit Fee)",
                 ],
             )
 
-            if str_launch.button("💸 Simuleer Betaling Nou"):
-                # Elke transaksie verhoog die XCHEF-E token-prys gebaseer op volume (Adoption Curve)
-                prys_stiging = bedrag * 0.00005
-                str_launch.session_state["xchef_e_price"] += prys_stiging
+            if str_launch.button("💸 Simulate Payment Now"):
+                # Every transaction increases the XCHEF-E token price based on volume (Adoption Curve)
+                price_increase = amount * 0.00005
+                str_launch.session_state["xchef_e_price"] += price_increase
 
-                if tipe_transaksie.startswith("Geverifieerde Boer Koop"):
+                if transaction_type.startswith("Verified Farmer Purchases"):
                     if (
                         "Farmer"
-                        not in str_launch.session_state["user_profile"]["rol"]
+                        not in str_launch.session_state["user_profile"]["role"]
                     ):
                         str_launch.warning(
-                            "⚠️ Slegs geverifieerde Boere met API &"
-                            " GPS-plaasverifikasie kwalifiseer vir die 5%"
-                            " Boere-Korting!"
+                            "⚠️ Only verified Farmers with API &"
+                            " GPS farm verification qualify for the 5%"
+                            " Farmer Discount!"
                         )
                     else:
-                        korting = bedrag * 0.05
-                        eind_bedrag = bedrag - korting
+                        discount = amount * 0.05
+                        final_amount = amount - discount
 
                         if (
                             str_launch.session_state["wallets"]["Farmer"]
-                            >= eind_bedrag
+                            >= final_amount
                         ):
                             str_launch.session_state["wallets"][
                                 "Farmer"
-                            ] -= eind_bedrag
-                            treasury_fee = bedrag * 0.01
+                            ] -= final_amount
+                            treasury_fee = amount * 0.01
                             str_launch.session_state["wallets"][
                                 "Treasury_Inflows"
                             ] += treasury_fee
 
                             str_launch.session_state["tx_history"].insert(
                                 0,
-                                f"🚜 Geverifieerde Boer ({str_launch.session_state['user_profile']['naam']} - {str_launch.session_state['user_profile']['boerdery_naam']}) koop voorraad vir {bedrag:.2f} met 5% Boere-Korting ({korting:.2f} af). XCHEF-E prys styg na ${str_launch.session_state['xchef_e_price']:.4f}!",
+                                f"🚜 Verified Farmer ({str_launch.session_state['user_profile']['name']} - {str_launch.session_state['user_profile']['farm_name']}) buys inventory for {amount:.2f} with a 5% Farmer Discount ({discount:.2f} off). XCHEF-E price increased to ${str_launch.session_state['xchef_e_price']:.4f}!",
                             )
                             str_launch.success(
-                                "Produktiewe Boere-Transaksie Suksesvol met"
-                                " Korting!"
+                                "Productive Farmer Transaction Successful with"
+                                " Discount!"
                             )
                             str_launch.rerun()
                         else:
                             str_launch.error(
-                                "Onvoldoende fondse in Farmer Wallet!"
+                                "Insufficient funds in Farmer Wallet!"
                             )
 
-                elif tipe_transaksie.startswith("Verbruiker Koop Kos"):
-                    fee = bedrag * 0.02
-                    cashback = bedrag * 0.01
-                    netto_merchant = bedrag - fee
+                elif transaction_type.startswith("Consumer Purchases Food"):
+                    fee = amount * 0.02
+                    cashback = amount * 0.01
+                    net_merchant = amount - fee
 
                     if (
                         str_launch.session_state["wallets"]["Consumer"]
-                        >= bedrag
+                        >= amount
                     ):
                         str_launch.session_state["wallets"][
                             "Consumer"
-                        ] -= bedrag
+                        ] -= amount
                         str_launch.session_state["wallets"][
                             "Merchant"
-                        ] += netto_merchant
+                        ] += net_merchant
                         str_launch.session_state["wallets"][
                             "Treasury_Inflows"
                         ] += fee
@@ -511,42 +513,42 @@ else:
 
                         str_launch.session_state["tx_history"].insert(
                             0,
-                            f"✅ Verbruiker spandeer {bedrag:.2f} XCHEF-P. Handelaar kry {netto_merchant:.2f}, Tesourie kry {fee:.2f} fee, Verbruiker kry {cashback:.2f} XCHEF-E cashback. Coin prys nou ${str_launch.session_state['xchef_e_price']:.4f}!",
+                            f"✅ Consumer spends {amount:.2f} XCHEF-P. Merchant receives {net_merchant:.2f}, Treasury receives {fee:.2f} fee, Consumer receives {cashback:.2f} XCHEF-E cashback. Coin price now ${str_launch.session_state['xchef_e_price']:.4f}!",
                         )
                         str_launch.success(
-                            "Verbruiker Transaksie suksesvol verwerk!"
+                            "Consumer Transaction processed successfully!"
                         )
                         str_launch.rerun()
                     else:
                         str_launch.error(
-                            "Onvoldoende fondse in Consumer Wallet!"
+                            "Insufficient funds in Consumer Wallet!"
                         )
 
-                elif tipe_transaksie.startswith("Fiat On-Ramp"):
-                    onramp_fee = bedrag * 0.10
-                    netto_krediet = bedrag - onramp_fee
+                elif transaction_type.startswith("Fiat On-Ramp"):
+                    onramp_fee = amount * 0.10
+                    net_credit = amount - onramp_fee
                     str_launch.session_state["wallets"][
                         "Consumer"
-                    ] += netto_krediet
+                    ] += net_credit
                     str_launch.session_state["wallets"][
                         "Treasury_Inflows"
                     ] += onramp_fee
                     str_launch.session_state["tx_history"].insert(
                         0,
-                        f"💵 Fiat On-Ramp van ${bedrag:.2f}. Tesourie kry {onramp_fee:.2f} deposit fee. Koper kry {netto_krediet:.2f} XCHEF-P. Coin prys nou ${str_launch.session_state['xchef_e_price']:.4f}!",
+                        f"💵 Fiat On-Ramp of ${amount:.2f}. Treasury receives {onramp_fee:.2f} deposit fee. Buyer receives {net_credit:.2f} XCHEF-P. Coin price now ${str_launch.session_state['xchef_e_price']:.4f}!",
                     )
-                    str_launch.success("Fiat On-Ramp Suksesvol!")
+                    str_launch.success("Fiat On-Ramp Successful!")
                     str_launch.rerun()
 
         with st_col_b:
-            str_launch.subheader("📜 Intydse Transaksie Logboek")
+            str_launch.subheader("📜 Real-Time Transaction Log")
             if str_launch.session_state["tx_history"]:
                 for log in str_launch.session_state["tx_history"][:6]:
                     str_launch.info(log)
             else:
                 str_launch.write(
-                    "Geen transaksies nog uitgevoer nie. Klik die knoppie links"
-                    " om te simuleer!"
+                    "No transactions executed yet. Click the button on the left"
+                    " to simulate!"
                 )
 
     # ------------------------------------------
@@ -554,27 +556,27 @@ else:
     # ------------------------------------------
     with tab2:
         str_launch.subheader(
-            "📄 Fast-Track: Laai 'n Projek-dokument op (PDF, DOCX, TXT, MD)"
+            "📄 Fast-Track: Upload a Project Document (PDF, DOCX, TXT, MD)"
         )
-        opgelaaide_lêer = str_launch.file_uploader(
-            "Sleep jou Whitepaper of Pitch Deck PDF hierin:",
+        uploaded_file = str_launch.file_uploader(
+            "Drag & drop your Whitepaper or Pitch Deck PDF here:",
             type=["pdf", "docx", "txt", "md"],
         )
 
-        dokument_inhoud = ""
-        if opgelaaide_lêer is not None:
-            dokument_inhoud = lees_dokument_teks(opgelaaide_lêer)
+        document_content = ""
+        if uploaded_file is not None:
+            document_content = read_document_texts(uploaded_file)
             str_launch.success(
-                f"✓ {opgelaaide_lêer.name} suksesvol gelaai! Reg om te verwerk."
+                f"✓ {uploaded_file.name} successfully loaded! Ready to process."
             )
 
         str_launch.markdown("---")
         str_launch.subheader(
-            "⚙️ Projek Parameters (Opsioneel as 'n dokument opgelaai is)"
+            "⚙️ Project Parameters (Optional if a document is uploaded)"
         )
 
-        model_tipe = str_launch.selectbox(
-            "Kies jou Ekonomiese Argitektuur:",
+        model_type = str_launch.selectbox(
+            "Select your Economic Architecture:",
             [
                 (
                     "Dual-Token Model (Stablecoin + Economic Growth Token)"
@@ -584,64 +586,64 @@ else:
                 "Hybrid Governance & Reward Token Model",
             ],
         )
-        nut_beskrywing = str_launch.text_area(
-            "1. Token-nut & Ekosisteem-insentiewe (Utility & Staking):", height=80
+        utility_description = str_launch.text_area(
+            "1. Token Utility & Ecosystem Incentives (Utility & Staking):", height=80
         )
-        supply_beskrywing = str_launch.text_area(
-            "2. Voorsiening & Distribusie (Supply, Vesting & Allocation):",
+        supply_description = str_launch.text_area(
+            "2. Supply & Distribution (Supply, Vesting & Allocation):",
             height=80,
         )
-        treasury_beskrywing = str_launch.text_area(
-            "3. Tesourie Reëls & Waarde-vanging (Treasury Flows & Value"
+        treasury_description = str_launch.text_area(
+            "3. Treasury Rules & Value Capture (Treasury Flows & Value"
             " Capture):",
             height=80,
         )
 
         str_launch.markdown("<br>", unsafe_allow_html=True)
 
-        if str_launch.button("🚀 Genereer Volledige Projek Bloudruk"):
-            het_teks_in_bokse = bool(
-                nut_beskrywing.strip()
-                or supply_beskrywing.strip()
-                or treasury_beskrywing.strip()
+        if str_launch.button("🚀 Generate Full Project Blueprint"):
+            has_text_in_boxes = bool(
+                utility_description.strip()
+                or supply_description.strip()
+                or treasury_description.strip()
             )
-            het_dokument = bool(dokument_inhoud.strip())
+            has_document = bool(document_content.strip())
 
-            if not het_teks_in_bokse and not het_dokument:
+            if not has_text_in_boxes and not has_document:
                 str_launch.error(
-                    "⚠️ Vul asseblief minstens een teksboks in OF laai 'n"
-                    " PDF/Word-dokument op!"
+                    "⚠️ Please fill in at least one text box OR upload a"
+                    " PDF/Word document!"
                 )
             else:
                 with str_launch.spinner(
-                    "AI besig om jou dokument en parameters te ontleed... (dit"
-                    " neem 5-10 sekondes)"
+                    "AI analyzing your document and parameters... (this"
+                    " takes 5-10 seconds)"
                 ):
-                    meester_verslag = analiseer_groot_visie(
-                        model_tipe,
-                        nut_beskrywing,
-                        supply_beskrywing,
-                        treasury_beskrywing,
-                        dokument_inhoud,
+                    master_report = analyze_grand_vision(
+                        model_type,
+                        utility_description,
+                        supply_description,
+                        treasury_description,
+                        document_content,
                     )
-                    str_launch.session_state["hoof_verslag"] = meester_verslag
-                    str_launch.session_state["chat_geskiedenis"] = [{
-                        "rol": "ai",
-                        "teks": (
+                    str_launch.session_state["main_report"] = master_report
+                    str_launch.session_state["chat_history"] = [{
+                        "role": "ai",
+                        "text": (
                             "Master Blueprint generated successfully. Ask me"
                             " any follow-up questions!"
                         ),
                     }]
                 str_launch.rerun()
 
-        if "hoof_verslag" in str_launch.session_state:
-            str_launch.subheader("📊 Jou Amptelike Projek Bloudruk")
+        if "main_report" in str_launch.session_state:
+            str_launch.subheader("📊 Your Official Project Blueprint")
             str_launch.download_button(
                 label="💾 Download Master Blueprint (.md)",
-                data=str_launch.session_state["hoof_verslag"],
+                data=str_launch.session_state["main_report"],
                 file_name="XCHEF_Master_Blueprint.md",
             )
             str_launch.markdown(
-                f'<div class="report-box">{str_launch.session_state["hoof_verslag"]}</div>',
+                f'<div class="report-box">{str_launch.session_state["main_report"]}</div>',
                 unsafe_allow_html=True,
             )
