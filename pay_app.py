@@ -2,7 +2,7 @@ import os
 import time
 import docx
 import pandas as pd
-from google import genai
+import google.genai as genai
 from pypdf import PdfReader
 import streamlit as str_launch
 
